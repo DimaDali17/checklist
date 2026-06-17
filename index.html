@@ -242,11 +242,11 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Inter
       <button class="filter-btn" id="pf-urgent" onclick="setProjectFilter('urgent',this)">🔥 Срочно</button>
     </div>
     <div class="projects-toolbar">
-      <select class="project-sort-select" id="projectSortSel" onchange="renderProjects(); renderTasksColumn();">
-        <option value="date_desc">Новые сверху</option>
-        <option value="deadline">По дедлайну</option>
-        <option value="priority">По приоритету</option>
-        <option value="person">По имени</option>
+      <select class="project-sort-select" id="projectSortSel" onchange="setProjectSort(this.value)">
+        <option value="date_desc" ${projectSort==='date_desc'?'selected':''}>Новые сверху</option>
+        <option value="deadline" ${projectSort==='deadline'?'selected':''}>По дедлайну</option>
+        <option value="priority" ${projectSort==='priority'?'selected':''}>По приоритету</option>
+        <option value="person" ${projectSort==='person'?'selected':''}>По имени</option>
       </select>
     </div>
     <div class="project-list" id="projectList"></div>
@@ -343,6 +343,8 @@ let tasks = {};             // { taskId: {id,projectId,title,person,priority,dea
 let comments = {};          // { taskId: { commentId: {text,author,createdAt} } }
 let filter = 'all';
 let projectFilter = 'all';
+let taskSort = 'date_desc';
+let projectSort = 'date_desc';
 let currentProjectId = null;
 let currentTaskId = null;
 let currentUser = localStorage.getItem('ef_username') || '';
@@ -547,6 +549,12 @@ window.setProjectFilter = function(f, btn) {
   renderTasksColumn();
 };
 
+window.setProjectSort = function(val) {
+  projectSort = val;
+  renderProjects();
+  renderTasksColumn();
+};
+
 function renderProjects() {
   const el = document.getElementById('projectList');
   let list = Object.values(projects);
@@ -556,7 +564,7 @@ function renderProjects() {
   else if (projectFilter==='all') list = list.filter(p=>p.status!=='done');
   else list = list.filter(p=>p.status===projectFilter);
 
-  const sort = document.getElementById('projectSortSel')?.value || 'date_desc';
+  const sort = projectSort;
   if (sort==='date_desc') list.sort((a,b)=>b.createdAt-a.createdAt);
   else if (sort==='deadline') list.sort((a,b)=>{
     if (!a.deadline&&!b.deadline) return 0;
@@ -826,8 +834,13 @@ const prBadge = {p1:['b-p1','Высокий'],p2:['b-p2','Средний'],p3:['
 
 window.setFilter = function(f,btn) {
   filter=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.toolbar .filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  renderTasksColumn();
+};
+
+window.setTaskSort = function(val) {
+  taskSort = val;
   renderTasksColumn();
 };
 
@@ -845,7 +858,7 @@ function renderTasksColumn() {
   if (filter==='urgent') list=list.filter(isUrgent);
   else if (filter!=='all') list=list.filter(t=>t.status===filter);
 
-  const sort = document.getElementById('sortSel')?.value||'date_desc';
+  const sort = taskSort;
   if (sort==='date_desc') list.sort((a,b)=>b.createdAt-a.createdAt);
   else if (sort==='deadline') list.sort((a,b)=>{
     if (!a.deadline&&!b.deadline) return 0;
@@ -907,11 +920,11 @@ function renderTasksColumn() {
       <button class="filter-btn ${filter==='review'?'active':''}" onclick="setFilter('review',this)">На проверке</button>
       <button class="filter-btn ${filter==='done'?'active':''}" onclick="setFilter('done',this)">Готово</button>
       <button class="filter-btn ${filter==='urgent'?'active':''}" onclick="setFilter('urgent',this)">🔥 Срочно</button>
-      <select class="sort-select" id="sortSel" onchange="renderTasksColumn()">
-        <option value="date_desc">Новые сверху</option>
-        <option value="deadline">По дедлайну</option>
-        <option value="priority">По приоритету</option>
-        <option value="person">По имени</option>
+      <select class="sort-select" id="sortSel" onchange="setTaskSort(this.value)">
+        <option value="date_desc" ${taskSort==='date_desc'?'selected':''}>Новые сверху</option>
+        <option value="deadline" ${taskSort==='deadline'?'selected':''}>По дедлайну</option>
+        <option value="priority" ${taskSort==='priority'?'selected':''}>По приоритету</option>
+        <option value="person" ${taskSort==='person'?'selected':''}>По имени</option>
       </select>
     </div>
 
