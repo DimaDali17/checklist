@@ -32,14 +32,16 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Inter
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 /* LAYOUT: two columns */
-.layout { display:flex; max-width:1280px; margin:0 auto; min-height:calc(100vh - 69px); }
+.layout { display:flex; max-width:1440px; margin:0 auto; min-height:calc(100vh - 69px); }
 
 /* ── PROJECTS COLUMN (left) ── */
-.projects-col { width:300px; flex-shrink:0; border-right:1px solid var(--border); padding:20px 14px; display:flex; flex-direction:column; gap:10px; }
-.projects-head { display:flex; align-items:center; justify-content:space-between; padding:0 6px 4px; }
+.projects-col { width:33%; min-width:320px; max-width:460px; flex-shrink:0; border-right:1px solid var(--border); padding:20px 14px; display:flex; flex-direction:column; gap:10px; }
+.projects-head { display:flex; align-items:center; justify-content:space-between; padding:0 6px 4px; flex-wrap:wrap; gap:8px; }
 .projects-title { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:var(--text-muted); }
-.btn-new-project { width:24px; height:24px; border:1px solid var(--border-md); border-radius:7px; background:var(--surface); color:var(--text); cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+.btn-new-project { width:24px; height:24px; border:1px solid var(--border-md); border-radius:7px; background:var(--surface); color:var(--text); cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; }
 .btn-new-project:hover { background:var(--accent); color:var(--accent-text); border-color:var(--accent); }
+.projects-toolbar { display:flex; align-items:center; gap:8px; padding:0 6px; margin-bottom:2px; }
+.project-sort-select { height:28px; padding:0 8px; border:1px solid var(--border-md); border-radius:20px; background:var(--surface); color:var(--text-muted); font-size:11.5px; cursor:pointer; outline:none; font-family:inherit; flex:1; }
 .project-list { display:flex; flex-direction:column; gap:5px; overflow-y:auto; }
 .project-item { display:flex; flex-direction:column; gap:7px; padding:11px 12px; border-radius:var(--radius-sm); cursor:pointer; transition:background 0.15s; border:1px solid var(--border); background:var(--surface); }
 .project-item:hover { border-color:var(--border-md); }
@@ -230,6 +232,14 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Inter
     <div class="projects-head">
       <span class="projects-title">Проекты</span>
       <button class="btn-new-project" onclick="showNewProjectModal()" title="Новый проект">+</button>
+    </div>
+    <div class="projects-toolbar">
+      <select class="project-sort-select" id="projectSortSel" onchange="renderProjects()">
+        <option value="date_desc">Новые сверху</option>
+        <option value="deadline">По дедлайну</option>
+        <option value="priority">По приоритету</option>
+        <option value="person">По имени</option>
+      </select>
     </div>
     <div class="project-list" id="projectList"></div>
   </aside>
@@ -522,7 +532,17 @@ window.deleteProject = function(id, e) {
 
 function renderProjects() {
   const el = document.getElementById('projectList');
-  const list = Object.values(projects).sort((a,b)=>b.createdAt-a.createdAt);
+  let list = Object.values(projects);
+
+  const sort = document.getElementById('projectSortSel')?.value || 'date_desc';
+  if (sort==='date_desc') list.sort((a,b)=>b.createdAt-a.createdAt);
+  else if (sort==='deadline') list.sort((a,b)=>{
+    if (!a.deadline&&!b.deadline) return 0;
+    if (!a.deadline) return 1; if (!b.deadline) return -1;
+    return a.deadline.localeCompare(b.deadline);
+  });
+  else if (sort==='priority') { const o={p1:0,p2:1,p3:2}; list.sort((a,b)=>(o[a.priority]||2)-(o[b.priority]||2)); }
+  else if (sort==='person') list.sort((a,b)=>(a.person||'').localeCompare(b.person||''));
 
   if (list.length===0) {
     el.innerHTML = '<div class="projects-empty">Проектов нет.<br>Создайте первый — кнопка «+»</div>';
