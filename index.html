@@ -31,24 +31,55 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Inter
 .sync-dot.error { background:#E24B4A; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-/* MAIN */
-.main { max-width:900px; margin:0 auto; padding:24px 20px 80px; }
+/* LAYOUT: two columns */
+.layout { display:flex; max-width:1280px; margin:0 auto; min-height:calc(100vh - 69px); }
+
+/* ── PROJECTS COLUMN (left) ── */
+.projects-col { width:300px; flex-shrink:0; border-right:1px solid var(--border); padding:20px 14px; display:flex; flex-direction:column; gap:10px; }
+.projects-head { display:flex; align-items:center; justify-content:space-between; padding:0 6px 4px; }
+.projects-title { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:var(--text-muted); }
+.btn-new-project { width:24px; height:24px; border:1px solid var(--border-md); border-radius:7px; background:var(--surface); color:var(--text); cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+.btn-new-project:hover { background:var(--accent); color:var(--accent-text); border-color:var(--accent); }
+.project-list { display:flex; flex-direction:column; gap:5px; overflow-y:auto; }
+.project-item { display:flex; flex-direction:column; gap:7px; padding:11px 12px; border-radius:var(--radius-sm); cursor:pointer; transition:background 0.15s; border:1px solid var(--border); background:var(--surface); }
+.project-item:hover { border-color:var(--border-md); }
+.project-item.active { border-color:var(--border-md); box-shadow:var(--shadow); background:#FDFCF9; }
+.project-item.done { opacity:0.55; }
+.project-item.done .project-name { text-decoration:line-through; }
+.project-top-row { display:flex; align-items:center; gap:9px; }
+.project-check { width:19px; height:19px; border-radius:50%; border:1.5px solid var(--border-md); background:transparent; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.15s; color:transparent; font-size:10px; }
+.project-check.on { background:var(--accent); border-color:var(--accent); color:var(--accent-text); }
+.project-name { font-size:13.5px; font-weight:600; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.project-fire { font-size:12px; flex-shrink:0; }
+.project-meta-row { display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding-left:28px; }
+.project-count { font-size:10.5px; color:var(--text-hint); background:var(--surface2); border-radius:8px; padding:1px 7px; flex-shrink:0; }
+.projects-empty { padding:30px 10px; text-align:center; color:var(--text-hint); font-size:12.5px; }
+
+/* ── TASKS COLUMN (right) ── */
+.tasks-col { flex:1; padding:20px 24px 80px; min-width:0; overflow-y:auto; }
+.tasks-col-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:60vh; color:var(--text-hint); text-align:center; }
+.tasks-col-empty .big-icon { font-size:44px; margin-bottom:14px; opacity:0.4; }
+
+.project-header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.project-header-title { font-size:19px; font-weight:700; letter-spacing:-0.4px; flex:1; min-width:0; border:none; background:transparent; outline:none; font-family:inherit; color:var(--text); }
+.btn-del-project { width:32px; height:32px; border:1px solid var(--border); border-radius:var(--radius-sm); background:transparent; color:var(--text-hint); cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; }
+.btn-del-project:hover { background:#FAE0D8; border-color:#E0A090; color:#B03A1E; }
 
 /* STATS */
-.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
-.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 16px; }
-.stat-num { font-size:22px; font-weight:700; letter-spacing:-0.5px; }
-.stat-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:11px 14px; }
+.stat-num { font-size:20px; font-weight:700; letter-spacing:-0.5px; }
+.stat-label { font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
 
 /* ADD FORM */
-.add-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 20px; margin-bottom:18px; box-shadow:var(--shadow); }
-.add-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:var(--text-muted); margin-bottom:10px; }
+.add-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 18px; margin-bottom:16px; box-shadow:var(--shadow); }
+.add-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:var(--text-muted); margin-bottom:9px; }
 .add-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
 .field { display:flex; flex-direction:column; gap:4px; }
 .field label { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); }
 .field input, .field select { height:36px; padding:0 10px; border:1px solid var(--border-md); border-radius:var(--radius-sm); background:var(--bg); color:var(--text); font-size:14px; outline:none; transition:border-color 0.15s; font-family:inherit; }
 .field input:focus, .field select:focus { border-color:var(--accent); }
-.field-task { flex:1; min-width:180px; }
+.field-task { flex:1; min-width:160px; }
 .field-task input { width:100%; }
 .btn-add { height:36px; padding:0 20px; background:var(--accent); color:var(--accent-text); border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; transition:opacity 0.15s,transform 0.1s; font-family:inherit; }
 .btn-add:hover { opacity:0.88; }
@@ -93,8 +124,8 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Inter
 .st-select { height:28px; padding:0 8px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg); color:var(--text); font-size:12px; cursor:pointer; outline:none; font-family:inherit; }
 .btn-del { width:28px; height:28px; border:1px solid var(--border); border-radius:var(--radius-sm); background:transparent; color:var(--text-hint); cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
 .btn-del:hover { background:#FAE0D8; border-color:#E0A090; color:#B03A1E; }
-.empty { text-align:center; padding:60px 20px; color:var(--text-hint); }
-.empty-icon { font-size:36px; margin-bottom:10px; opacity:0.4; }
+.empty { text-align:center; padding:50px 20px; color:var(--text-hint); }
+.empty-icon { font-size:34px; margin-bottom:10px; opacity:0.4; }
 
 /* ── TASK DETAIL PANEL ── */
 .panel-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:200; opacity:0; pointer-events:none; transition:opacity 0.2s; }
@@ -103,6 +134,7 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Inter
 .panel.open { transform:translateX(0); }
 .panel-head { padding:18px 20px 14px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:12px; }
 .panel-head-body { flex:1; min-width:0; }
+.panel-breadcrumb { font-size:11px; color:var(--text-hint); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.4px; }
 .panel-title-input { width:100%; font-size:16px; font-weight:600; color:var(--text); border:none; background:transparent; outline:none; font-family:inherit; line-height:1.4; resize:none; }
 .panel-meta-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
 .panel-field { display:flex; flex-direction:column; gap:4px; }
@@ -145,19 +177,24 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Inter
 .modal-hint a { color:var(--accent); }
 .modal-hint code { background:rgba(0,0,0,0.07); padding:1px 5px; border-radius:4px; font-size:11px; }
 
-/* NAME MODAL — persons grid */
 .persons-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
 .person-btn { height:44px; border:1.5px solid var(--border-md); border-radius:var(--radius-sm); background:var(--bg); color:var(--text); font-size:14px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.15s; }
 .person-btn:hover { border-color:var(--accent); background:var(--surface2); }
 .person-btn.selected { border-color:var(--accent); background:var(--accent); color:var(--accent-text); }
 
+@media(max-width:900px) {
+  .layout { flex-direction:column; }
+  .projects-col { width:100%; border-right:none; border-bottom:1px solid var(--border); }
+  .project-list { flex-direction:row; overflow-x:auto; padding-bottom:4px; }
+  .project-item { flex-shrink:0; min-width:150px; }
+}
 @media(max-width:640px) {
   .stats { grid-template-columns:repeat(2,1fr); }
   .add-row { flex-direction:column; }
   .btn-add { width:100%; }
   .task-right { flex-direction:column; gap:4px; }
   .header { padding:12px 14px; }
-  .main { padding:16px 12px 80px; }
+  .tasks-col { padding:16px 12px 80px; }
   .panel { width:100vw; }
 }
 </style>
@@ -185,67 +222,31 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Inter
   </div>
 </header>
 
-<!-- MAIN -->
-<main class="main">
-  <div class="stats">
-    <div class="stat-card"><div class="stat-num" id="sTotal">0</div><div class="stat-label">Всего</div></div>
-    <div class="stat-card"><div class="stat-num" id="sDone">0</div><div class="stat-label">Готово</div></div>
-    <div class="stat-card"><div class="stat-num" id="sProgress">0</div><div class="stat-label">В работе</div></div>
-    <div class="stat-card"><div class="stat-num" id="sUrgent">0</div><div class="stat-label">🔥 Срочно</div></div>
-  </div>
+<!-- LAYOUT -->
+<div class="layout">
 
-  <div class="add-card">
-    <div class="add-label">Новая задача</div>
-    <div class="add-row">
-      <div class="field field-task">
-        <label>Задача</label>
-        <input type="text" id="newTitle" placeholder="Описание задачи..." maxlength="120">
-      </div>
-      <div class="field">
-        <label>Ответственный</label>
-        <select id="newPerson">
-          <option>Наташа</option><option>Саша</option><option>Амина</option><option>Китаец</option><option>Наташа,Саша</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Приоритет</label>
-        <select id="newPriority">
-          <option value="p3">Низкий</option>
-          <option value="p2" selected>Средний</option>
-          <option value="p1">Высокий 🔥</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Дедлайн</label>
-        <input type="date" id="newDate">
-      </div>
-      <button class="btn-add" onclick="addTask()">+ Добавить</button>
+  <!-- PROJECTS COLUMN -->
+  <aside class="projects-col">
+    <div class="projects-head">
+      <span class="projects-title">Проекты</span>
+      <button class="btn-new-project" onclick="showNewProjectModal()" title="Новый проект">+</button>
     </div>
-  </div>
+    <div class="project-list" id="projectList"></div>
+  </aside>
 
-  <div class="toolbar">
-    <button class="filter-btn active" onclick="setFilter('all',this)">Все</button>
-    <button class="filter-btn" onclick="setFilter('todo',this)">К выполнению</button>
-    <button class="filter-btn" onclick="setFilter('progress',this)">В работе</button>
-    <button class="filter-btn" onclick="setFilter('review',this)">На проверке</button>
-    <button class="filter-btn" onclick="setFilter('done',this)">Готово</button>
-    <button class="filter-btn" onclick="setFilter('urgent',this)">🔥 Срочно</button>
-    <select class="sort-select" id="sortSel" onchange="render()">
-      <option value="date_desc">Новые сверху</option>
-      <option value="deadline">По дедлайну</option>
-      <option value="priority">По приоритету</option>
-      <option value="person">По имени</option>
-    </select>
-  </div>
+  <!-- TASKS COLUMN -->
+  <main class="tasks-col" id="tasksCol">
+    <!-- filled by render() -->
+  </main>
 
-  <div class="tasks" id="tasksList"></div>
-</main>
+</div>
 
 <!-- TASK DETAIL PANEL -->
 <div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
 <div class="panel" id="taskPanel">
   <div class="panel-head">
     <div class="panel-head-body">
+      <div class="panel-breadcrumb" id="panelBreadcrumb"></div>
       <textarea class="panel-title-input" id="panelTitle" rows="2" onblur="savePanelTitle()"></textarea>
       <div class="panel-meta-row" id="panelMeta"></div>
     </div>
@@ -261,27 +262,34 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Inter
   </div>
 </div>
 
-<!-- FIREBASE SETUP MODAL -->
-<div class="modal-backdrop" id="setupModal" style="display:none">
+<!-- NEW PROJECT MODAL -->
+<div class="modal-backdrop" id="newProjectModal" style="display:none">
   <div class="modal">
-    <h2>🔥 Подключение к Firebase</h2>
-    <p>Введите параметры вашей Firebase Realtime Database. Сохранятся в браузере автоматически.</p>
+    <h2>📁 Новый проект</h2>
+    <p>Заполните как обычную задачу — эти же поля можно поменять позже.</p>
     <div class="modal-field">
-      <label>Database URL</label>
-      <input type="url" id="fbUrl" placeholder="https://ваш-проект-default-rtdb.firebaseio.com">
+      <label>Название проекта</label>
+      <input type="text" id="newProjectName" placeholder="Например: Запуск рекламы май" maxlength="80">
     </div>
     <div class="modal-field">
-      <label>API Key</label>
-      <input type="text" id="fbKey" placeholder="AIzaSy...">
+      <label>Ответственный</label>
+      <select id="newProjectPerson">
+        <option>Наташа</option><option>Саша</option><option>Амина</option><option>Китаец</option><option>Прочие</option>
+      </select>
     </div>
-    <button class="btn-primary" onclick="connectFirebase()">Подключиться</button>
-    <div class="modal-hint">
-      <b>Как получить (5 мин, бесплатно):</b><br>
-      1. <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> → создайте проект<br>
-      2. Realtime Database → создать → режим «Тест»<br>
-      3. Project Settings ⚙️ → добавьте Web App <b>&lt;/&gt;</b> → скопируйте <code>apiKey</code><br>
-      4. Rules: <code>{ "rules": { ".read": true, ".write": true } }</code>
+    <div class="modal-field">
+      <label>Приоритет</label>
+      <select id="newProjectPriority">
+        <option value="p3">Низкий</option>
+        <option value="p2" selected>Средний</option>
+        <option value="p1">Высокий 🔥</option>
+      </select>
     </div>
+    <div class="modal-field">
+      <label>Дедлайн</label>
+      <input type="date" id="newProjectDate">
+    </div>
+    <button class="btn-primary" onclick="createProject()">Создать проект</button>
   </div>
 </div>
 
@@ -303,19 +311,23 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,'Inter
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getDatabase, ref, set, push, onValue, remove, update }
+import { getDatabase, ref, set, push, get, onValue, remove, update }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+const DEFAULT_URL = 'https://check-list-29a98-default-rtdb.firebaseio.com';
+const DEFAULT_KEY = 'AIzaSyBUH1u3MZNFWBy9oaEmiT5NGcSTabs8woU';
+const FB_KEY = 'ef_firebase_config';
 
 // ── State ──
 let db = null;
-let tasks = {};
-let comments = {}; // { taskId: { commentId: {...} } }
+let projects = {};          // { projectId: {id,name,createdAt} }
+let tasks = {};             // { taskId: {id,projectId,title,person,priority,deadline,status,createdAt} }
+let comments = {};          // { taskId: { commentId: {text,author,createdAt} } }
 let filter = 'all';
+let currentProjectId = null;
 let currentTaskId = null;
 let currentUser = localStorage.getItem('ef_username') || '';
-let commentsUnsub = null;
-
-const FB_KEY = 'ef_firebase_config';
+let migrationDone = false;
 
 // ── Sync UI ──
 function syncStatus(state, label) {
@@ -329,40 +341,99 @@ function initFirebase(url, apiKey) {
   try {
     const app = initializeApp({apiKey, databaseURL:url}, 'easyform');
     db = getDatabase(app);
-    onValue(ref(db,'easyform_tasks'), snap => {
-      tasks = snap.val() || {};
-      render();
-      syncStatus('ok','Firebase · '+new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'}));
-    }, err => { syncStatus('error','Ошибка базы'); });
-    onValue(ref(db,'easyform_comments'), snap => {
-      comments = snap.val() || {};
-      if (currentTaskId) renderComments(currentTaskId);
-      render();
+    window._db = db;
+
+    runMigrationIfNeeded().then(() => {
+      onValue(ref(db,'easyform_projects'), snap => {
+        projects = snap.val() || {};
+        renderProjects();
+        renderTasksColumn();
+      });
+      onValue(ref(db,'easyform_tasks'), snap => {
+        tasks = snap.val() || {};
+        renderProjects();
+        renderTasksColumn();
+        syncStatus('ok','Firebase · '+new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'}));
+      }, err => { syncStatus('error','Ошибка базы'); });
+      onValue(ref(db,'easyform_comments'), snap => {
+        comments = snap.val() || {};
+        if (currentTaskId) renderComments(currentTaskId);
+        renderProjects();
+        renderTasksColumn();
+      });
     });
+
     syncStatus('syncing','Подключаемся...');
-    document.getElementById('setupModal').style.display = 'none';
   } catch(e) {
     syncStatus('error','Ошибка');
     alert('Ошибка Firebase: '+e.message);
   }
 }
 
-window.connectFirebase = function() {
-  const url = document.getElementById('fbUrl').value.trim();
-  const key = document.getElementById('fbKey').value.trim();
-  if (!url||!key) { alert('Введите оба поля'); return; }
-  localStorage.setItem(FB_KEY, JSON.stringify({url,key}));
-  initFirebase(url,key);
-};
+// ── ONE-TIME MIGRATION: old flat tasks -> each becomes its own project + 1 task inside ──
+async function runMigrationIfNeeded() {
+  try {
+    const migFlagSnap = await get(ref(db,'easyform_migration_v2_done'));
+    if (migFlagSnap.exists() && migFlagSnap.val()===true) { migrationDone = true; return; }
 
-// ── Auto-connect ──
-const DEFAULT_URL = 'https://check-list-29a98-default-rtdb.firebaseio.com';
-const DEFAULT_KEY = 'AIzaSyBUH1u3MZNFWBy9oaEmiT5NGcSTabs8woU';
+    const tasksSnap = await get(ref(db,'easyform_tasks'));
+    const oldTasks = tasksSnap.val() || {};
+    const oldTaskIds = Object.keys(oldTasks).filter(id => !oldTasks[id].projectId); // only un-migrated (flat) tasks
 
+    if (oldTaskIds.length === 0) {
+      await set(ref(db,'easyform_migration_v2_done'), true);
+      migrationDone = true;
+      return;
+    }
+
+    syncStatus('syncing','Переносим старые задачи в проекты...');
+
+    for (const oldId of oldTaskIds) {
+      const old = oldTasks[oldId];
+      const projectId = 'proj_'+oldId; // deterministic, avoids duplicate runs colliding
+      // Create project named after the old task, carrying over the same fields
+      await set(ref(db,'easyform_projects/'+projectId), {
+        id: projectId,
+        name: old.title || 'Без названия',
+        person: old.person || '',
+        priority: old.priority || 'p2',
+        deadline: old.deadline || '',
+        status: old.status || 'todo',
+        createdAt: old.createdAt || Date.now()
+      });
+      // Create a new task inside that project, duplicating the old task's data
+      const newTaskId = 'task_'+oldId+'_m';
+      await set(ref(db,'easyform_tasks/'+newTaskId), {
+        id: newTaskId,
+        projectId: projectId,
+        title: old.title || 'Без названия',
+        person: old.person || '',
+        priority: old.priority || 'p2',
+        deadline: old.deadline || '',
+        status: old.status || 'todo',
+        createdAt: old.createdAt || Date.now()
+      });
+      // Move comments from old task id to new task id
+      const commentsSnap = await get(ref(db,'easyform_comments/'+oldId));
+      if (commentsSnap.exists()) {
+        await set(ref(db,'easyform_comments/'+newTaskId), commentsSnap.val());
+      }
+      // Remove the old flat task (now duplicated safely inside the project)
+      await remove(ref(db,'easyform_tasks/'+oldId));
+    }
+
+    await set(ref(db,'easyform_migration_v2_done'), true);
+    migrationDone = true;
+  } catch(e) {
+    console.error('Migration error', e);
+  }
+}
+
+// ── Auto-connect (hardcoded, no manual entry needed) ──
 function boot() {
   const saved = localStorage.getItem(FB_KEY);
   if (saved) {
-    try { const {url,key}=JSON.parse(saved); if(url&&key){initFirebase(url,key);} else initFirebase(DEFAULT_URL,DEFAULT_KEY); }
+    try { const {url,key}=JSON.parse(saved); initFirebase(url||DEFAULT_URL, key||DEFAULT_KEY); }
     catch { initFirebase(DEFAULT_URL,DEFAULT_KEY); }
   } else {
     initFirebase(DEFAULT_URL,DEFAULT_KEY);
@@ -373,11 +444,6 @@ function boot() {
   } else {
     document.getElementById('currentUserLabel').textContent = currentUser;
   }
-}
-
-function showSetup() {
-  document.getElementById('setupModal').style.display = 'flex';
-  syncStatus('error','Нет подключения');
 }
 
 // ── Name modal ──
@@ -402,14 +468,109 @@ window.showNameModal = function() {
   document.getElementById('nameModal').style.display = 'flex';
 };
 
+// ── Projects ──
+window.showNewProjectModal = function() {
+  document.getElementById('newProjectName').value = '';
+  document.getElementById('newProjectModal').style.display = 'flex';
+  setTimeout(()=>document.getElementById('newProjectName').focus(),50);
+};
+window.createProject = function() {
+  if (!db) { alert('Подождите подключения к базе'); return; }
+  const name = document.getElementById('newProjectName').value.trim();
+  if (!name) return;
+  const id = 'proj_'+Date.now();
+  set(ref(db,'easyform_projects/'+id), {
+    id, name,
+    person: document.getElementById('newProjectPerson').value,
+    priority: document.getElementById('newProjectPriority').value,
+    deadline: document.getElementById('newProjectDate').value||'',
+    status: 'todo',
+    createdAt: Date.now()
+  });
+  document.getElementById('newProjectModal').style.display = 'none';
+  currentProjectId = id;
+};
+window.toggleProjectDone = function(id, e) {
+  e && e.stopPropagation();
+  const p = projects[id]; if (!p) return;
+  update(ref(db,'easyform_projects/'+id), {status: p.status==='done'?'todo':'done'});
+};
+window.changeProjectStatus = function(id, val) {
+  update(ref(db,'easyform_projects/'+id), {status: val});
+};
+window.updateProjectField = function(id, field, value) {
+  update(ref(db,'easyform_projects/'+id), {[field]:value});
+};
+function isProjectUrgent(p) {
+  if (p.status==='done') return false;
+  if (p.priority==='p1') return true;
+  if (!p.deadline) return false;
+  return Math.ceil((new Date(p.deadline)-new Date())/86400000)<=2;
+}
+window.selectProject = function(id) {
+  currentProjectId = id;
+  renderProjects();
+  renderTasksColumn();
+};
+window.deleteProject = function(id, e) {
+  e && e.stopPropagation();
+  const projTasks = Object.values(tasks).filter(t=>t.projectId===id);
+  const msg = projTasks.length>0
+    ? `Удалить проект и ${projTasks.length} задачу(и) внутри? Это нельзя отменить.`
+    : 'Удалить проект?';
+  if (!confirm(msg)) return;
+  projTasks.forEach(t => {
+    remove(ref(db,'easyform_tasks/'+t.id));
+    remove(ref(db,'easyform_comments/'+t.id));
+  });
+  remove(ref(db,'easyform_projects/'+id));
+  if (currentProjectId===id) currentProjectId = null;
+};
+
+function renderProjects() {
+  const el = document.getElementById('projectList');
+  const list = Object.values(projects).sort((a,b)=>b.createdAt-a.createdAt);
+
+  if (list.length===0) {
+    el.innerHTML = '<div class="projects-empty">Проектов нет.<br>Создайте первый — кнопка «+»</div>';
+    return;
+  }
+
+  // auto-select first project if none selected
+  if (!currentProjectId && list.length>0) currentProjectId = list[0].id;
+
+  el.innerHTML = list.map(p=>{
+    const count = Object.values(tasks).filter(t=>t.projectId===p.id).length;
+    const done = p.status==='done';
+    const urg = isProjectUrgent(p);
+    const dl = p.deadline ? deadlineInfo(p.deadline) : null;
+    const [prCls,prLbl] = prBadge[p.priority] || ['b-p3','—'];
+    return `<div class="project-item ${p.id===currentProjectId?'active':''} ${done?'done':''}" onclick="selectProject('${p.id}')">
+      <div class="project-top-row">
+        <button class="project-check ${done?'on':''}" onclick="toggleProjectDone('${p.id}',event)" title="Отметить выполненным">✓</button>
+        <span class="project-name">${esc(p.name)}</span>
+        ${urg&&!done?'<span class="project-fire">🔥</span>':''}
+        <span class="project-count">${count}</span>
+      </div>
+      <div class="project-meta-row">
+        <span class="badge ${stBadge[p.status]||'b-todo'}">${stLabel[p.status]||p.status}</span>
+        <span class="badge ${prCls}">${prLbl}</span>
+        ${p.person?`<span class="badge b-person">👤 ${esc(p.person)}</span>`:''}
+        ${dl?`<span class="task-date ${dl.cls}">${dl.text}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // ── Tasks ──
 window.addTask = function() {
-  if (!db) { alert('Сначала подключитесь к Firebase'); return; }
+  if (!db) { alert('Сначала подождите подключения к базе'); return; }
+  if (!currentProjectId) { alert('Сначала выберите или создайте проект'); return; }
   const title = document.getElementById('newTitle').value.trim();
   if (!title) { document.getElementById('newTitle').focus(); return; }
   const id = 'task_'+Date.now();
   set(ref(db,'easyform_tasks/'+id), {
-    id, title,
+    id, projectId: currentProjectId, title,
     person: document.getElementById('newPerson').value,
     priority: document.getElementById('newPriority').value,
     deadline: document.getElementById('newDate').value||'',
@@ -438,14 +599,17 @@ window.deleteTask = function(id, e) {
   if (currentTaskId===id) closePanel();
 };
 
-// ── Panel ──
+// ── Detail Panel (shared by tasks and projects) ──
+let currentEntityType = null; // 'task' | 'project'
+
 window.openPanel = function(id) {
   const t = tasks[id]; if (!t) return;
   currentTaskId = id;
+  currentEntityType = 'task';
+  const proj = projects[t.projectId];
+  document.getElementById('panelBreadcrumb').textContent = proj ? ('📁 '+proj.name) : '';
   document.getElementById('panelTitle').value = t.title;
 
-  // meta selects
-  const stLabel = {todo:'К выполнению',progress:'В работе',review:'На проверке',done:'Готово'};
   document.getElementById('panelMeta').innerHTML = `
     <div class="panel-field">
       <label>Статус</label>
@@ -458,13 +622,13 @@ window.openPanel = function(id) {
     </div>
     <div class="panel-field">
       <label>Ответственный</label>
-      <select onchange="update(window._fbRef('easyform_tasks/${id}'),{person:this.value})">
+      <select onchange="updateTaskField('${id}','person',this.value)">
         ${['Наташа','Саша','Амина','Китаец','Прочие'].map(n=>`<option ${t.person===n?'selected':''}>${n}</option>`).join('')}
       </select>
     </div>
     <div class="panel-field">
       <label>Приоритет</label>
-      <select onchange="update(window._fbRef('easyform_tasks/${id}'),{priority:this.value})">
+      <select onchange="updateTaskField('${id}','priority',this.value)">
         <option value="p1" ${t.priority==='p1'?'selected':''}>Высокий 🔥</option>
         <option value="p2" ${t.priority==='p2'?'selected':''}>Средний</option>
         <option value="p3" ${t.priority==='p3'?'selected':''}>Низкий</option>
@@ -472,7 +636,7 @@ window.openPanel = function(id) {
     </div>
     <div class="panel-field">
       <label>Дедлайн</label>
-      <input type="date" value="${t.deadline||''}" onchange="update(window._fbRef('easyform_tasks/${id}'),{deadline:this.value})">
+      <input type="date" value="${t.deadline||''}" onchange="updateTaskField('${id}','deadline',this.value)">
     </div>`;
 
   renderComments(id);
@@ -481,19 +645,67 @@ window.openPanel = function(id) {
   document.getElementById('commentText').focus();
 };
 
-window._fbRef = (path) => ref(db, path);
-window.update = update;
+window.openProjectPanel = function(id, e) {
+  e && e.stopPropagation();
+  const p = projects[id]; if (!p) return;
+  currentTaskId = id; // reuse same variable as the "current entity id" for comments
+  currentEntityType = 'project';
+  const taskCount = Object.values(tasks).filter(t=>t.projectId===id).length;
+  document.getElementById('panelBreadcrumb').textContent = '📁 Проект · ' + taskCount + ' задач внутри';
+  document.getElementById('panelTitle').value = p.name;
+
+  document.getElementById('panelMeta').innerHTML = `
+    <div class="panel-field">
+      <label>Статус</label>
+      <select onchange="changeProjectStatus('${id}',this.value)">
+        <option value="todo" ${p.status==='todo'?'selected':''}>К выполнению</option>
+        <option value="progress" ${p.status==='progress'?'selected':''}>В работе</option>
+        <option value="review" ${p.status==='review'?'selected':''}>На проверке</option>
+        <option value="done" ${p.status==='done'?'selected':''}>Готово</option>
+      </select>
+    </div>
+    <div class="panel-field">
+      <label>Ответственный</label>
+      <select onchange="updateProjectField('${id}','person',this.value)">
+        ${['Наташа','Саша','Амина','Китаец','Прочие'].map(n=>`<option ${p.person===n?'selected':''}>${n}</option>`).join('')}
+      </select>
+    </div>
+    <div class="panel-field">
+      <label>Приоритет</label>
+      <select onchange="updateProjectField('${id}','priority',this.value)">
+        <option value="p1" ${p.priority==='p1'?'selected':''}>Высокий 🔥</option>
+        <option value="p2" ${p.priority==='p2'?'selected':''}>Средний</option>
+        <option value="p3" ${p.priority==='p3'?'selected':''}>Низкий</option>
+      </select>
+    </div>
+    <div class="panel-field">
+      <label>Дедлайн</label>
+      <input type="date" value="${p.deadline||''}" onchange="updateProjectField('${id}','deadline',this.value)">
+    </div>`;
+
+  renderComments(id);
+  document.getElementById('panelOverlay').classList.add('open');
+  document.getElementById('taskPanel').classList.add('open');
+  document.getElementById('commentText').focus();
+};
+
+window.updateTaskField = function(id, field, value) {
+  update(ref(db,'easyform_tasks/'+id), {[field]:value});
+};
 
 window.savePanelTitle = function() {
-  if (!currentTaskId) return;
+  if (!currentTaskId || !currentEntityType) return;
   const val = document.getElementById('panelTitle').value.trim();
-  if (val) update(ref(db,'easyform_tasks/'+currentTaskId),{title:val});
+  if (!val) return;
+  if (currentEntityType==='task') update(ref(db,'easyform_tasks/'+currentTaskId),{title:val});
+  else if (currentEntityType==='project') update(ref(db,'easyform_projects/'+currentTaskId),{name:val});
 };
 
 window.closePanel = function() {
   document.getElementById('panelOverlay').classList.remove('open');
   document.getElementById('taskPanel').classList.remove('open');
   currentTaskId = null;
+  currentEntityType = null;
 };
 
 // ── Comments ──
@@ -530,7 +742,6 @@ window.sendComment = function() {
   syncStatus('syncing','Сохраняем...');
 };
 
-// Ctrl+Enter to send
 document.getElementById('commentText').addEventListener('keydown', e=>{
   if (e.key==='Enter'&&(e.ctrlKey||e.metaKey)) { e.preventDefault(); window.sendComment(); }
 });
@@ -565,7 +776,6 @@ function deadlineInfo(d) {
   return {text:fmt,cls:''};
 }
 
-// ── Render ──
 const stLabel = {todo:'К выполнению',progress:'В работе',review:'На проверке',done:'Готово'};
 const stBadge = {todo:'b-todo',progress:'b-progress',review:'b-review',done:'b-done'};
 const prBadge = {p1:['b-p1','Высокий'],p2:['b-p2','Средний'],p3:['b-p3','Низкий']};
@@ -574,11 +784,20 @@ window.setFilter = function(f,btn) {
   filter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  render();
+  renderTasksColumn();
 };
 
-window.render = function() {
-  let list = Object.values(tasks);
+// ── Render right column (header + add form + toolbar + task list) ──
+function renderTasksColumn() {
+  const col = document.getElementById('tasksCol');
+  const proj = currentProjectId ? projects[currentProjectId] : null;
+
+  if (!proj) {
+    col.innerHTML = `<div class="tasks-col-empty"><div class="big-icon">📁</div>Выберите проект слева<br>или создайте новый</div>`;
+    return;
+  }
+
+  let list = Object.values(tasks).filter(t=>t.projectId===currentProjectId);
   if (filter==='urgent') list=list.filter(isUrgent);
   else if (filter!=='all') list=list.filter(t=>t.status===filter);
 
@@ -592,19 +811,78 @@ window.render = function() {
   else if (sort==='priority') { const o={p1:0,p2:1,p3:2}; list.sort((a,b)=>(o[a.priority]||2)-(o[b.priority]||2)); }
   else if (sort==='person') list.sort((a,b)=>(a.person||'').localeCompare(b.person||''));
 
-  const all = Object.values(tasks);
-  document.getElementById('sTotal').textContent = all.length;
-  document.getElementById('sDone').textContent = all.filter(t=>t.status==='done').length;
-  document.getElementById('sProgress').textContent = all.filter(t=>t.status==='progress').length;
-  document.getElementById('sUrgent').textContent = all.filter(isUrgent).length;
+  const all = Object.values(tasks).filter(t=>t.projectId===currentProjectId);
 
-  const el = document.getElementById('tasksList');
+  col.innerHTML = `
+    <div class="project-header">
+      <input class="project-header-title" id="projectTitleInput" value="${esc(proj.name)}" onblur="saveProjectName('${proj.id}',this.value)">
+      <button class="btn-del-project" onclick="openProjectPanel('${proj.id}',event)" title="Детали проекта и комментарии" style="font-size:14px;">💬</button>
+      <button class="btn-del-project" onclick="deleteProject('${proj.id}',event)" title="Удалить проект">×</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num">${all.length}</div><div class="stat-label">Всего</div></div>
+      <div class="stat-card"><div class="stat-num">${all.filter(t=>t.status==='done').length}</div><div class="stat-label">Готово</div></div>
+      <div class="stat-card"><div class="stat-num">${all.filter(t=>t.status==='progress').length}</div><div class="stat-label">В работе</div></div>
+      <div class="stat-card"><div class="stat-num">${all.filter(isUrgent).length}</div><div class="stat-label">🔥 Срочно</div></div>
+    </div>
+
+    <div class="add-card">
+      <div class="add-label">Новая задача</div>
+      <div class="add-row">
+        <div class="field field-task">
+          <label>Задача</label>
+          <input type="text" id="newTitle" placeholder="Описание задачи..." maxlength="120">
+        </div>
+        <div class="field">
+          <label>Ответственный</label>
+          <select id="newPerson">
+            <option>Наташа</option><option>Саша</option><option>Амина</option><option>Китаец</option><option>Прочие</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Приоритет</label>
+          <select id="newPriority">
+            <option value="p3">Низкий</option>
+            <option value="p2" selected>Средний</option>
+            <option value="p1">Высокий 🔥</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Дедлайн</label>
+          <input type="date" id="newDate">
+        </div>
+        <button class="btn-add" onclick="addTask()">+ Добавить</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="filter-btn ${filter==='all'?'active':''}" onclick="setFilter('all',this)">Все</button>
+      <button class="filter-btn ${filter==='todo'?'active':''}" onclick="setFilter('todo',this)">К выполнению</button>
+      <button class="filter-btn ${filter==='progress'?'active':''}" onclick="setFilter('progress',this)">В работе</button>
+      <button class="filter-btn ${filter==='review'?'active':''}" onclick="setFilter('review',this)">На проверке</button>
+      <button class="filter-btn ${filter==='done'?'active':''}" onclick="setFilter('done',this)">Готово</button>
+      <button class="filter-btn ${filter==='urgent'?'active':''}" onclick="setFilter('urgent',this)">🔥 Срочно</button>
+      <select class="sort-select" id="sortSel" onchange="renderTasksColumn()">
+        <option value="date_desc">Новые сверху</option>
+        <option value="deadline">По дедлайну</option>
+        <option value="priority">По приоритету</option>
+        <option value="person">По имени</option>
+      </select>
+    </div>
+
+    <div class="tasks" id="tasksList"></div>
+  `;
+
+  document.getElementById('newTitle').addEventListener('keydown', e=>{ if(e.key==='Enter') window.addTask(); });
+
+  const tasksListEl = document.getElementById('tasksList');
   if (list.length===0) {
-    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>Задач нет. Добавьте первую!</p></div>';
+    tasksListEl.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>Задач нет. Добавьте первую!</p></div>';
     return;
   }
 
-  el.innerHTML = list.map(t=>{
+  tasksListEl.innerHTML = list.map(t=>{
     const done=t.status==='done', urg=isUrgent(t);
     const dl=t.deadline?deadlineInfo(t.deadline):null;
     const [prCls,prLbl]=prBadge[t.priority]||['b-p3','—'];
@@ -635,9 +913,12 @@ window.render = function() {
       </div>
     </div>`;
   }).join('');
-};
+}
 
-document.getElementById('newTitle').addEventListener('keydown', e=>{ if(e.key==='Enter') window.addTask(); });
+window.saveProjectName = function(id, val) {
+  val = val.trim();
+  if (val) update(ref(db,'easyform_projects/'+id), {name: val});
+};
 
 boot();
 </script>
