@@ -336,6 +336,58 @@ function syncStatus(state, label) {
   dot.className = 'sync-dot' + (state==='syncing'?' syncing':state==='error'?' error':'');
 }
 
+// ── ONE-TIME MIGRATION: old flat easyform_tasks -> each becomes a project + 1 task inside, in the new isolated checklist_app namespace ──
+async function runMigrationIfNeeded() {
+  try {
+    const flagSnap = await get(ref(db,'checklist_app/migrated_from_easyform'));
+    if (flagSnap.exists() && flagSnap.val()===true) return;
+
+    const oldTasksSnap = await get(ref(db,'easyform_tasks'));
+    const oldTasks = oldTasksSnap.val() || {};
+    const oldIds = Object.keys(oldTasks);
+
+    if (oldIds.length === 0) {
+      await set(ref(db,'checklist_app/migrated_from_easyform'), true);
+      return;
+    }
+
+    syncStatus('syncing','Переносим задачи в проекты...');
+
+    for (const oldId of oldIds) {
+      const old = oldTasks[oldId];
+      const projectId = 'proj_'+oldId;
+      await set(ref(db,'checklist_app/projects/'+projectId), {
+        id: projectId,
+        name: old.title || 'Без названия',
+        person: old.person || '',
+        priority: old.priority || 'p2',
+        deadline: old.deadline || '',
+        status: old.status || 'todo',
+        createdAt: old.createdAt || Date.now()
+      });
+      const newTaskId = 'task_'+oldId;
+      await set(ref(db,'checklist_app/tasks/'+newTaskId), {
+        id: newTaskId,
+        projectId: projectId,
+        title: old.title || 'Без названия',
+        person: old.person || '',
+        priority: old.priority || 'p2',
+        deadline: old.deadline || '',
+        status: old.status || 'todo',
+        createdAt: old.createdAt || Date.now()
+      });
+      const oldCommentsSnap = await get(ref(db,'easyform_comments/'+oldId));
+      if (oldCommentsSnap.exists()) {
+        await set(ref(db,'checklist_app/comments/'+newTaskId), oldCommentsSnap.val());
+      }
+    }
+
+    await set(ref(db,'checklist_app/migrated_from_easyform'), true);
+  } catch(e) {
+    console.error('Migration error', e);
+  }
+}
+
 // ── Firebase ──
 function initFirebase(url, apiKey) {
   try {
@@ -344,18 +396,18 @@ function initFirebase(url, apiKey) {
     window._db = db;
 
     runMigrationIfNeeded().then(() => {
-      onValue(ref(db,'easyform_projects'), snap => {
+      onValue(ref(db,'checklist_app/projects'), snap => {
         projects = snap.val() || {};
         renderProjects();
         renderTasksColumn();
       });
-      onValue(ref(db,'easyform_tasks'), snap => {
+      onValue(ref(db,'checklist_app/tasks'), snap => {
         tasks = snap.val() || {};
         renderProjects();
         renderTasksColumn();
         syncStatus('ok','Firebase · '+new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'}));
       }, err => { syncStatus('error','Ошибка базы'); });
-      onValue(ref(db,'easyform_comments'), snap => {
+      onValue(ref(db,'checklist_app/comments'), snap => {
         comments = snap.val() || {};
         if (currentTaskId) renderComments(currentTaskId);
         renderProjects();
@@ -367,65 +419,6 @@ function initFirebase(url, apiKey) {
   } catch(e) {
     syncStatus('error','Ошибка');
     alert('Ошибка Firebase: '+e.message);
-  }
-}
-
-// ── ONE-TIME MIGRATION: old flat tasks -> each becomes its own project + 1 task inside ──
-async function runMigrationIfNeeded() {
-  try {
-    const migFlagSnap = await get(ref(db,'easyform_migration_v2_done'));
-    if (migFlagSnap.exists() && migFlagSnap.val()===true) { migrationDone = true; return; }
-
-    const tasksSnap = await get(ref(db,'easyform_tasks'));
-    const oldTasks = tasksSnap.val() || {};
-    const oldTaskIds = Object.keys(oldTasks).filter(id => !oldTasks[id].projectId); // only un-migrated (flat) tasks
-
-    if (oldTaskIds.length === 0) {
-      await set(ref(db,'easyform_migration_v2_done'), true);
-      migrationDone = true;
-      return;
-    }
-
-    syncStatus('syncing','Переносим старые задачи в проекты...');
-
-    for (const oldId of oldTaskIds) {
-      const old = oldTasks[oldId];
-      const projectId = 'proj_'+oldId; // deterministic, avoids duplicate runs colliding
-      // Create project named after the old task, carrying over the same fields
-      await set(ref(db,'easyform_projects/'+projectId), {
-        id: projectId,
-        name: old.title || 'Без названия',
-        person: old.person || '',
-        priority: old.priority || 'p2',
-        deadline: old.deadline || '',
-        status: old.status || 'todo',
-        createdAt: old.createdAt || Date.now()
-      });
-      // Create a new task inside that project, duplicating the old task's data
-      const newTaskId = 'task_'+oldId+'_m';
-      await set(ref(db,'easyform_tasks/'+newTaskId), {
-        id: newTaskId,
-        projectId: projectId,
-        title: old.title || 'Без названия',
-        person: old.person || '',
-        priority: old.priority || 'p2',
-        deadline: old.deadline || '',
-        status: old.status || 'todo',
-        createdAt: old.createdAt || Date.now()
-      });
-      // Move comments from old task id to new task id
-      const commentsSnap = await get(ref(db,'easyform_comments/'+oldId));
-      if (commentsSnap.exists()) {
-        await set(ref(db,'easyform_comments/'+newTaskId), commentsSnap.val());
-      }
-      // Remove the old flat task (now duplicated safely inside the project)
-      await remove(ref(db,'easyform_tasks/'+oldId));
-    }
-
-    await set(ref(db,'easyform_migration_v2_done'), true);
-    migrationDone = true;
-  } catch(e) {
-    console.error('Migration error', e);
   }
 }
 
@@ -479,7 +472,7 @@ window.createProject = function() {
   const name = document.getElementById('newProjectName').value.trim();
   if (!name) return;
   const id = 'proj_'+Date.now();
-  set(ref(db,'easyform_projects/'+id), {
+  set(ref(db,'checklist_app/projects/'+id), {
     id, name,
     person: document.getElementById('newProjectPerson').value,
     priority: document.getElementById('newProjectPriority').value,
@@ -493,13 +486,13 @@ window.createProject = function() {
 window.toggleProjectDone = function(id, e) {
   e && e.stopPropagation();
   const p = projects[id]; if (!p) return;
-  update(ref(db,'easyform_projects/'+id), {status: p.status==='done'?'todo':'done'});
+  update(ref(db,'checklist_app/projects/'+id), {status: p.status==='done'?'todo':'done'});
 };
 window.changeProjectStatus = function(id, val) {
-  update(ref(db,'easyform_projects/'+id), {status: val});
+  update(ref(db,'checklist_app/projects/'+id), {status: val});
 };
 window.updateProjectField = function(id, field, value) {
-  update(ref(db,'easyform_projects/'+id), {[field]:value});
+  update(ref(db,'checklist_app/projects/'+id), {[field]:value});
 };
 function isProjectUrgent(p) {
   if (p.status==='done') return false;
@@ -520,10 +513,10 @@ window.deleteProject = function(id, e) {
     : 'Удалить проект?';
   if (!confirm(msg)) return;
   projTasks.forEach(t => {
-    remove(ref(db,'easyform_tasks/'+t.id));
-    remove(ref(db,'easyform_comments/'+t.id));
+    remove(ref(db,'checklist_app/tasks/'+t.id));
+    remove(ref(db,'checklist_app/comments/'+t.id));
   });
-  remove(ref(db,'easyform_projects/'+id));
+  remove(ref(db,'checklist_app/projects/'+id));
   if (currentProjectId===id) currentProjectId = null;
 };
 
@@ -569,7 +562,7 @@ window.addTask = function() {
   const title = document.getElementById('newTitle').value.trim();
   if (!title) { document.getElementById('newTitle').focus(); return; }
   const id = 'task_'+Date.now();
-  set(ref(db,'easyform_tasks/'+id), {
+  set(ref(db,'checklist_app/tasks/'+id), {
     id, projectId: currentProjectId, title,
     person: document.getElementById('newPerson').value,
     priority: document.getElementById('newPriority').value,
@@ -585,17 +578,17 @@ window.addTask = function() {
 window.toggleDone = function(id, e) {
   e && e.stopPropagation();
   const t = tasks[id]; if (!t) return;
-  update(ref(db,'easyform_tasks/'+id),{status: t.status==='done'?'todo':'done'});
+  update(ref(db,'checklist_app/tasks/'+id),{status: t.status==='done'?'todo':'done'});
 };
 window.changeStatus = function(id, val, e) {
   e && e.stopPropagation();
-  update(ref(db,'easyform_tasks/'+id),{status:val});
+  update(ref(db,'checklist_app/tasks/'+id),{status:val});
 };
 window.deleteTask = function(id, e) {
   e && e.stopPropagation();
   if (!confirm('Удалить задачу?')) return;
-  remove(ref(db,'easyform_tasks/'+id));
-  remove(ref(db,'easyform_comments/'+id));
+  remove(ref(db,'checklist_app/tasks/'+id));
+  remove(ref(db,'checklist_app/comments/'+id));
   if (currentTaskId===id) closePanel();
 };
 
@@ -690,15 +683,15 @@ window.openProjectPanel = function(id, e) {
 };
 
 window.updateTaskField = function(id, field, value) {
-  update(ref(db,'easyform_tasks/'+id), {[field]:value});
+  update(ref(db,'checklist_app/tasks/'+id), {[field]:value});
 };
 
 window.savePanelTitle = function() {
   if (!currentTaskId || !currentEntityType) return;
   const val = document.getElementById('panelTitle').value.trim();
   if (!val) return;
-  if (currentEntityType==='task') update(ref(db,'easyform_tasks/'+currentTaskId),{title:val});
-  else if (currentEntityType==='project') update(ref(db,'easyform_projects/'+currentTaskId),{name:val});
+  if (currentEntityType==='task') update(ref(db,'checklist_app/tasks/'+currentTaskId),{title:val});
+  else if (currentEntityType==='project') update(ref(db,'checklist_app/projects/'+currentTaskId),{name:val});
 };
 
 window.closePanel = function() {
@@ -735,7 +728,7 @@ window.sendComment = function() {
   if (!currentUser) { showNameModal(); return; }
   const text = document.getElementById('commentText').value.trim();
   if (!text) return;
-  push(ref(db,'easyform_comments/'+currentTaskId), {
+  push(ref(db,'checklist_app/comments/'+currentTaskId), {
     text, author:currentUser, createdAt:Date.now()
   });
   document.getElementById('commentText').value = '';
@@ -917,7 +910,7 @@ function renderTasksColumn() {
 
 window.saveProjectName = function(id, val) {
   val = val.trim();
-  if (val) update(ref(db,'easyform_projects/'+id), {name: val});
+  if (val) update(ref(db,'checklist_app/projects/'+id), {name: val});
 };
 
 boot();
